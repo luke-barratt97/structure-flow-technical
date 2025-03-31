@@ -55,6 +55,12 @@ app.patch(
         req.params.id,
         req.body
       );
+      // If company does not exist, return 200 with message
+      if (!company) {
+        res.status(200).json({ message: "Company not found" });
+        return;
+      }
+      // If company exists, return 200 with message and updated company document
       res.status(200).json({ message: "Company updated", company });
     } catch (err) {
       res.status(400).json({ message: "Bad Request", status: 400 });

@@ -54,11 +54,15 @@ function updateCompany(id, company) {
         const companyUpdateObject = (0, helper_1.flattenAddressObject)(company);
         try {
             // Update company document
-            yield db
+            const updateResult = yield db
                 .collection("companies")
                 .updateOne({ _id: new mongodb_1.ObjectId(id) }, { $set: companyUpdateObject });
+            // If company does not exist, return null
+            if (updateResult.matchedCount === 0) {
+                return null;
+            }
             // Get updated company document
-            let res = yield db
+            const res = yield db
                 .collection("companies")
                 .findOne({ _id: new mongodb_1.ObjectId(id) });
             // If company exists in cache, update the cache

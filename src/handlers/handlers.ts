@@ -41,12 +41,17 @@ export async function updateCompany(
   const companyUpdateObject = flattenAddressObject(company);
   try {
     // Update company document
-    await db
+    const updateResult = await db
       .collection("companies")
       .updateOne({ _id: new ObjectId(id) }, { $set: companyUpdateObject });
 
+    // If company does not exist, return null
+    if (updateResult.matchedCount === 0) {
+      return null;
+    }
+
     // Get updated company document
-    let res: Company | null = await db
+    const res: Company | null = await db
       .collection<Company>("companies")
       .findOne({ _id: new ObjectId(id) });
 

@@ -50,6 +50,12 @@ app.get("/structure-flow/companies/:id", (req, res) => __awaiter(void 0, void 0,
 app.patch("/structure-flow/companies/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const company = yield (0, handlers_1.updateCompany)(req.params.id, req.body);
+        // If company does not exist, return 200 with message
+        if (!company) {
+            res.status(200).json({ message: "Company not found" });
+            return;
+        }
+        // If company exists, return 200 with message and updated company document
         res.status(200).json({ message: "Company updated", company });
     }
     catch (err) {
