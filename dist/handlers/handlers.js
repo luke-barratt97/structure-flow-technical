@@ -61,7 +61,7 @@ function updateCompany(id, company) {
             let res = yield db
                 .collection("companies")
                 .findOne({ _id: new mongodb_1.ObjectId(id) });
-            // Update company was updated and is cached update the cache
+            // If company exists in cache, update the cache
             if (res) {
                 const redis = yield (0, redis_1.getRedisClient)();
                 yield redis.set(`companies:${id}`, JSON.stringify(res), {
