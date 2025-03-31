@@ -50,7 +50,7 @@ export async function updateCompany(
       .collection<Company>("companies")
       .findOne({ _id: new ObjectId(id) });
 
-    // Update company was updated and is cached update the cache
+    // If company exists in cache, update the cache
     if (res) {
       const redis = await getRedisClient();
       await redis.set(`companies:${id}`, JSON.stringify(res), {
