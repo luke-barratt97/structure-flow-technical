@@ -1,4 +1,5 @@
 import { Company } from "../../src/collections/company";
+import { ObjectId } from "mongodb";
 
 // Company ID for testing
 const companyId = "6061f1f3b5c7962b18c13a40";
@@ -29,7 +30,7 @@ const mockUpdatedCompany: Company = {
 };
 
 // Setup mocks
-const companyOId = { toString: () => companyId };
+const companyOId = new ObjectId(companyId);
 const mockInsertOne = jest.fn().mockResolvedValue({ insertedId: companyOId });
 const mockFindOne = jest
   .fn()
@@ -45,10 +46,6 @@ const mockRedisSet = jest.fn().mockResolvedValue("OK");
 const mockRedisDelete = jest.fn().mockResolvedValue(1);
 
 // Mock modules
-jest.mock("mongodb", () => ({
-  ObjectId: jest.fn().mockReturnValue(companyOId),
-}));
-
 jest.mock("../../src/database", () => ({
   dbConnection: jest.fn().mockResolvedValue({
     collection: jest.fn().mockReturnValue({
@@ -99,10 +96,10 @@ describe("Company Handlers", () => {
       expect(mockFindOne).toHaveBeenCalledWith({ _id: companyOId });
       expect(mockRedisSet).toHaveBeenCalledWith(
         `companies:${companyId}`,
-        expect.any(String),
-        expect.objectContaining({ EX: 600 })
+        JSON.stringify({ _id: companyOId, ...mockCompany }),
+        { EX: 600 }
       );
-      expect(result).toEqual(expect.objectContaining(mockCompany));
+      expect(result).toEqual({ _id: companyOId, ...mockCompany });
     });
 
     test("should return a company from cache when available", async () => {
@@ -114,7 +111,7 @@ describe("Company Handlers", () => {
 
       expect(mockRedisGet).toHaveBeenCalledWith(`companies:${companyId}`);
       expect(mockFindOne).not.toHaveBeenCalled();
-      expect(result).toEqual(expect.objectContaining(mockCompany));
+      expect(result).toEqual({ _id: companyId, ...mockCompany });
     });
   });
 
@@ -147,7 +144,7 @@ describe("Company Handlers", () => {
         }
       );
 
-      expect(result).toEqual(expect.objectContaining(mockUpdatedCompany));
+      expect(result).toEqual({ _id: companyOId, ...mockUpdatedCompany });
     });
 
     test("should update cache if company is already cached", async () => {
@@ -169,13 +166,13 @@ describe("Company Handlers", () => {
       expect(mockRedisSet).toHaveBeenCalledWith(
         `companies:${companyId}`,
         JSON.stringify({ _id: companyOId, ...mockUpdatedCompany }),
-        expect.objectContaining({
+        {
           EX: 600,
           XX: true,
-        })
+        }
       );
 
-      expect(result).toEqual(expect.objectContaining(mockUpdatedCompany));
+      expect(result).toEqual({ _id: companyOId, ...mockUpdatedCompany });
     });
   });
 
