@@ -82,7 +82,7 @@ describe("Company Handlers", () => {
     test("should create a company and return its ID", async () => {
       const result = await createCompany(mockCompany);
       expect(mockInsertOne).toHaveBeenCalledWith(mockCompany);
-      expect(result.toString()).toBe(companyId);
+      expect(result).toBe(companyOId);
     });
   });
 
