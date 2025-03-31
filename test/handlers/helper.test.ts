@@ -1,5 +1,5 @@
-import { flattenAddressObject } from "../src/handlers/helper";
-import { Company } from "../src/collections/company";
+import { flattenAddressObject } from "../../src/handlers/helper";
+import { Company } from "../../src/collections/company";
 
 describe("Handlers Helper", () => {
   describe("flattenAddressObject", () => {

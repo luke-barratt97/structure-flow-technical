@@ -1,4 +1,4 @@
-import { Company } from "../src/collections/company";
+import { Company } from "../../src/collections/company";
 
 // Company ID for testing
 const companyId = "6061f1f3b5c7962b18c13a40";
@@ -49,7 +49,7 @@ jest.mock("mongodb", () => ({
   ObjectId: jest.fn().mockReturnValue(companyOId),
 }));
 
-jest.mock("../src/database", () => ({
+jest.mock("../../src/database", () => ({
   dbConnection: jest.fn().mockResolvedValue({
     collection: jest.fn().mockReturnValue({
       insertOne: mockInsertOne,
@@ -60,7 +60,7 @@ jest.mock("../src/database", () => ({
   }),
 }));
 
-jest.mock("../src/redis", () => ({
+jest.mock("../../src/redis", () => ({
   getRedisClient: jest.fn().mockResolvedValue({
     get: mockRedisGet,
     set: mockRedisSet,
@@ -74,7 +74,7 @@ import {
   getCompany,
   updateCompany,
   deleteCompany,
-} from "../src/handlers/handlers";
+} from "../../src/handlers/handlers";
 
 // Run Tests
 describe("Company Handlers", () => {
