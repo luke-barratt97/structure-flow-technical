@@ -39,7 +39,8 @@ app.get(
   async (req: Request, res: Response) => {
     try {
       const company: Company | null = await getCompany(req.params.id);
-      res.status(200).json(company);
+      const message = company ? "Company found" : "Company not found";
+      res.status(200).json({ message, company });
     } catch (err) {
       res.status(400).json({ message: "Bad Request", status: 400 });
     }

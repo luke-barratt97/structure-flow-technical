@@ -40,7 +40,8 @@ app.post("/structure-flow/companies", (req, res) => __awaiter(void 0, void 0, vo
 app.get("/structure-flow/companies/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const company = yield (0, handlers_1.getCompany)(req.params.id);
-        res.status(200).json(company);
+        const message = company ? "Company found" : "Company not found";
+        res.status(200).json({ message, company });
     }
     catch (err) {
         res.status(400).json({ message: "Bad Request", status: 400 });
