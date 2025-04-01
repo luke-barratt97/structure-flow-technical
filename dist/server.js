@@ -78,7 +78,6 @@ app.delete("/structure-flow/companies/:id", auth_1.authenticateToken, (req, res)
 // Auth
 app.post("/structure-flow/auth", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const username = req.body.username;
-    // TODO: We would want check that the username exists and they are signed up for the service before generating a token for them
     const token = (0, auth_1.generateAccessToken)({ name: username });
     res.status(200).json({ message: "Token generated", token });
 }));
