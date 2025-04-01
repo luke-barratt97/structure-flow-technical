@@ -95,7 +95,7 @@ app.delete(
 app.post("/structure-flow/auth", async (req: Request, res: Response) => {
   const username = req.body.username;
 
-  // TODO: We would want check that the username exists and they are signed up for the service before generating a token
+  // TODO: We would want check that the username exists and they are signed up for the service before generating a token for them
 
   const token = generateAccessToken({ name: username });
   res.status(200).json({ message: "Token generated", token });

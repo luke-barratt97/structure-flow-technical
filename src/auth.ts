@@ -15,9 +15,15 @@ export function authenticateToken(
 ) {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
-  if (token == null) return res.sendStatus(401);
 
+  // Authorization header is required
+  if (token == null) {
+    return res.sendStatus(401);
+  }
+
+  // Verify the token
   jwt.verify(token, process.env.TOKEN_SECRET!, (err: any, decoded: any) => {
+    // If the token is invalid, return a 403 Forbidden status
     if (err) return res.sendStatus(403);
     console.log(decoded);
     next();

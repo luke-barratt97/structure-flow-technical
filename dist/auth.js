@@ -14,9 +14,13 @@ function generateAccessToken(user) {
 function authenticateToken(req, res, next) {
     const authHeader = req.headers["authorization"];
     const token = authHeader && authHeader.split(" ")[1];
-    if (token == null)
+    // Authorization header is required
+    if (token == null) {
         return res.sendStatus(401);
+    }
+    // Verify the token
     jsonwebtoken_1.default.verify(token, process.env.TOKEN_SECRET, (err, decoded) => {
+        // If the token is invalid, return a 403 Forbidden status
         if (err)
             return res.sendStatus(403);
         console.log(decoded);
