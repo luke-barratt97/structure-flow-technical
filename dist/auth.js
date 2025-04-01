@@ -23,7 +23,6 @@ function authenticateToken(req, res, next) {
         // If the token is invalid, return a 403 Forbidden status
         if (err)
             return res.sendStatus(403);
-        console.log(decoded);
         next();
     });
 }
