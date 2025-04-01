@@ -7,6 +7,7 @@ A RESTful API service for managing company data. Built with Express, TypeScript,
 - CRUD operations for company data
 - MongoDB for persistent storage
 - Redis caching for improved performance
+- JSON Web Token (JWT) for authentication
 - TypeScript for type safety
 - Jest for testing
 

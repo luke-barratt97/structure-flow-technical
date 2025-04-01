@@ -10,6 +10,7 @@ import {
 } from "./handlers/handlers";
 import { getRedisClient } from "./redis";
 import { dbConnection } from "./database";
+import { generateAccessToken, authenticateToken } from "./auth";
 
 // Load environment variables from .env file
 dotenv.config();
@@ -24,14 +25,18 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes
 // Create Company
-app.post("/structure-flow/companies", async (req: Request, res: Response) => {
-  try {
-    const companyId: ObjectId = await createCompany(req.body);
-    res.status(200).json({ message: "Company created", _id: companyId });
-  } catch (err) {
-    res.status(400).json({ message: "Bad Request", status: 400 });
+app.post(
+  "/structure-flow/companies",
+  authenticateToken,
+  async (req: Request, res: Response) => {
+    try {
+      const companyId: ObjectId = await createCompany(req.body);
+      res.status(200).json({ message: "Company created", _id: companyId });
+    } catch (err) {
+      res.status(400).json({ message: "Bad Request", status: 400 });
+    }
   }
-});
+);
 
 // Get Company
 app.get(
@@ -50,6 +55,7 @@ app.get(
 // Update Company
 app.patch(
   "/structure-flow/companies/:id",
+  authenticateToken,
   async (req: Request, res: Response) => {
     try {
       const company: Company | null = await updateCompany(
@@ -72,6 +78,7 @@ app.patch(
 // Delete Company
 app.delete(
   "/structure-flow/companies/:id",
+  authenticateToken,
   async (req: Request, res: Response) => {
     try {
       const deletedCount: number = await deleteCompany(req.params.id);
@@ -83,6 +90,13 @@ app.delete(
     }
   }
 );
+
+// Auth
+app.post("/structure-flow/auth", async (req: Request, res: Response) => {
+  const username = req.body.username;
+  const token = generateAccessToken({ name: username });
+  res.status(200).json({ message: "Token generated", token });
+});
 
 // Start server
 app.listen(port, async () => {
