@@ -47,22 +47,26 @@ const mockRedisDelete = jest.fn().mockResolvedValue(1);
 
 // Mock modules
 jest.mock("../../src/database", () => ({
-  dbConnection: jest.fn().mockResolvedValue({
-    collection: jest.fn().mockReturnValue({
-      insertOne: mockInsertOne,
-      findOne: mockFindOne,
-      updateOne: mockUpdateOne,
-      deleteOne: mockDeleteOne,
+  Database: {
+    getInstance: jest.fn().mockResolvedValue({
+      collection: jest.fn().mockReturnValue({
+        insertOne: mockInsertOne,
+        findOne: mockFindOne,
+        updateOne: mockUpdateOne,
+        deleteOne: mockDeleteOne,
+      }),
     }),
-  }),
+  },
 }));
 
 jest.mock("../../src/redis", () => ({
-  getRedisClient: jest.fn().mockResolvedValue({
-    get: mockRedisGet,
-    set: mockRedisSet,
-    del: mockRedisDelete,
-  }),
+  Redis: {
+    getClient: jest.fn().mockResolvedValue({
+      get: mockRedisGet,
+      set: mockRedisSet,
+      del: mockRedisDelete,
+    }),
+  },
 }));
 
 // Import handler functions
