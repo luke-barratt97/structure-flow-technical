@@ -14,9 +14,9 @@ exports.updateCompany = updateCompany;
 exports.getCompany = getCompany;
 exports.deleteCompany = deleteCompany;
 const mongodb_1 = require("mongodb");
-const database_1 = require("../database");
 const helper_1 = require("./helper");
 const redis_1 = require("../redis");
+const database_1 = require("../database");
 /**
  * ## Create Company
  *
@@ -27,7 +27,7 @@ const redis_1 = require("../redis");
  */
 function createCompany(company) {
     return __awaiter(this, void 0, void 0, function* () {
-        const db = yield (0, database_1.dbConnection)();
+        const db = yield database_1.Database.getInstance();
         try {
             const res = yield db
                 .collection("companies")
@@ -50,7 +50,7 @@ function createCompany(company) {
  */
 function updateCompany(id, company) {
     return __awaiter(this, void 0, void 0, function* () {
-        const db = yield (0, database_1.dbConnection)();
+        const db = yield database_1.Database.getInstance();
         const companyUpdateObject = (0, helper_1.flattenAddressObject)(company);
         try {
             // Update company document
@@ -67,7 +67,7 @@ function updateCompany(id, company) {
                 .findOne({ _id: new mongodb_1.ObjectId(id) });
             // If company exists in cache, update the cache
             if (res) {
-                const redis = yield (0, redis_1.getRedisClient)();
+                const redis = yield redis_1.Redis.getClient();
                 yield redis.set(`companies:${id}`, JSON.stringify(res), {
                     EX: 600, // Cache for 10 minutes
                     XX: true, // Only update if the cache key exists
@@ -92,7 +92,7 @@ function getCompany(id) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             // Try to get company from cache first
-            const redis = yield (0, redis_1.getRedisClient)();
+            const redis = yield redis_1.Redis.getClient();
             const cacheKey = `companies:${id}`;
             const cachedCompany = yield redis.get(cacheKey);
             // If company is cached return it
@@ -100,7 +100,7 @@ function getCompany(id) {
                 return JSON.parse(cachedCompany);
             }
             // Not cached, get company from database
-            const db = yield (0, database_1.dbConnection)();
+            const db = yield database_1.Database.getInstance();
             const company = yield db
                 .collection("companies")
                 .findOne({ _id: new mongodb_1.ObjectId(id) });
@@ -127,7 +127,7 @@ function getCompany(id) {
  */
 function deleteCompany(id) {
     return __awaiter(this, void 0, void 0, function* () {
-        const db = yield (0, database_1.dbConnection)();
+        const db = yield database_1.Database.getInstance();
         try {
             // Delete from database first
             const res = yield db
@@ -135,7 +135,7 @@ function deleteCompany(id) {
                 .deleteOne({ _id: new mongodb_1.ObjectId(id) });
             // If company was deleted from database, delete from cache if it exists
             if (res.deletedCount === 1) {
-                const redis = yield (0, redis_1.getRedisClient)();
+                const redis = yield redis_1.Redis.getClient();
                 yield redis.del(`companies:${id}`);
             }
             return res.deletedCount;

@@ -85,10 +85,10 @@ app.post("/structure-flow/auth", (req, res) => __awaiter(void 0, void 0, void 0,
 app.listen(port, () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         console.log(`Server running on port ${port} 🚀`);
-        // Connect to Redis
-        yield (0, redis_1.getRedisClient)();
-        // Connect to MongoDB
-        yield (0, database_1.dbConnection)();
+        // Initialise Redis
+        yield redis_1.Redis.getClient();
+        // Initialise MongoDB
+        yield database_1.Database.getInstance();
     }
     catch (err) {
         console.error("Error connecting to Redis or MongoDB:", err);

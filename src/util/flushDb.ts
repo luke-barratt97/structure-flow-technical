@@ -1,6 +1,5 @@
-import { mongoDbClient } from "../database";
+import { Database } from "../database";
 import { jsonSchema as companySchema } from "../collections/company";
-import { Db } from "mongodb";
 
 /**
  * ## Flush Database
@@ -9,12 +8,9 @@ import { Db } from "mongodb";
  */
 export async function flushDb(): Promise<void> {
   try {
-    mongoDbClient.connect();
-    const db: Db = mongoDbClient.db(process.env.MONGO_DB_NAME!);
-
+    const db = await Database.getInstance();
     // Drop companies collection
     await db.collection("companies").drop();
-
     // Create companies collection
     await db.createCollection("companies", {
       validator: {
@@ -22,8 +18,8 @@ export async function flushDb(): Promise<void> {
       },
     });
 
+    await Database.close();
     console.log("Database flushed successfully");
-    mongoDbClient.close();
   } catch (error) {
     throw error;
   }

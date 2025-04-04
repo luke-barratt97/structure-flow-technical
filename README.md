@@ -28,7 +28,7 @@ A RESTful API service for managing company data. Built with Express, TypeScript,
    Create a `.env` file in the root directory with the following variables:
    ```
    PORT=3000
-   MONGODB_URI=mongodb+srv://your_username:your_password@your_cluster.mongodb.net/?retryWrites=true
+   MONGO_DB_URI=mongodb+srv://your_username:your_password@your_cluster.mongodb.net/?retryWrites=true
    MONGO_DB_NAME=structure_flow
    REDIS_URL=redis://localhost:6379
    ```
@@ -70,6 +70,7 @@ npm test
 | GET    | `/structure-flow/companies/:id` | Get a company by ID  |
 | PATCH  | `/structure-flow/companies/:id` | Update a company     |
 | DELETE | `/structure-flow/companies/:id` | Delete a company     |
+| POST   | `/structure-flow/auth`          | Get Access Token     |
 
 ### Data Model
 

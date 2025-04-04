@@ -20,8 +20,7 @@ const company_1 = require("../collections/company");
 function flushDb() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            database_1.mongoDbClient.connect();
-            const db = database_1.mongoDbClient.db(process.env.MONGO_DB_NAME);
+            const db = yield database_1.Database.getInstance();
             // Drop companies collection
             yield db.collection("companies").drop();
             // Create companies collection
@@ -30,8 +29,8 @@ function flushDb() {
                     $jsonSchema: company_1.jsonSchema,
                 },
             });
+            yield database_1.Database.close();
             console.log("Database flushed successfully");
-            database_1.mongoDbClient.close();
         }
         catch (error) {
             throw error;

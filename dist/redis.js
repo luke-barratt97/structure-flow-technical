@@ -8,36 +8,43 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getRedisClient = getRedisClient;
+exports.Redis = void 0;
+const dotenv_1 = __importDefault(require("dotenv"));
 const redis_1 = require("redis");
-// Cache connection
-let redisClient = null;
-/**
- * ## Get Redis Client
- *
- * Connect to Redis client
- *
- * @returns {Promise<RedisClientType>} - The Redis client
- */
-function getRedisClient() {
-    return __awaiter(this, void 0, void 0, function* () {
-        // If Redis client already cached, return it
-        if (redisClient) {
-            return redisClient;
-        }
-        // Create Redis client
-        try {
-            redisClient = (0, redis_1.createClient)({
-                url: process.env.REDIS_URL,
-            });
-        }
-        catch (err) {
-            throw err;
-        }
-        // Connect to Redis
-        yield redisClient.connect();
-        console.log("Successfully connected to Redis");
-        return redisClient;
-    });
+dotenv_1.default.config();
+class Redis {
+    static getClient() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!Redis.client) {
+                if (!Redis.connectionString)
+                    throw new Error("REDIS_URL is not set in the environment variables.");
+                try {
+                    Redis.client = (0, redis_1.createClient)({
+                        url: Redis.connectionString,
+                    });
+                }
+                catch (error) {
+                    console.error("Error connecting to redis:", error);
+                    throw error;
+                }
+                yield Redis.client.connect();
+            }
+            return Redis.client;
+        });
+    }
+    static close() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (Redis.client) {
+                yield Redis.client.quit();
+                Redis.client = null;
+            }
+        });
+    }
 }
+exports.Redis = Redis;
+Redis.client = null;
+Redis.connectionString = process.env.REDIS_URL;

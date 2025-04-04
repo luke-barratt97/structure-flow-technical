@@ -1,9 +1,8 @@
 import { Db, ObjectId, InsertOneResult, DeleteResult } from "mongodb";
 import { Company } from "../collections/company";
-import { dbConnection } from "../database";
 import { flattenAddressObject } from "./helper";
-import { getRedisClient } from "../redis";
-
+import { Redis } from "../redis";
+import { Database } from "../database";
 /**
  * ## Create Company
  *
@@ -13,7 +12,7 @@ import { getRedisClient } from "../redis";
  * @returns {Promise<ObjectId>} - The ObjectId of the created company
  */
 export async function createCompany(company: Company): Promise<ObjectId> {
-  const db = await dbConnection();
+  const db = await Database.getInstance();
   try {
     const res: InsertOneResult = await db
       .collection("companies")
@@ -37,7 +36,7 @@ export async function updateCompany(
   id: string,
   company: Company
 ): Promise<Company | null> {
-  const db = await dbConnection();
+  const db = await Database.getInstance();
   const companyUpdateObject = flattenAddressObject(company);
   try {
     // Update company document
@@ -57,7 +56,7 @@ export async function updateCompany(
 
     // If company exists in cache, update the cache
     if (res) {
-      const redis = await getRedisClient();
+      const redis = await Redis.getClient();
       await redis.set(`companies:${id}`, JSON.stringify(res), {
         EX: 600, // Cache for 10 minutes
         XX: true, // Only update if the cache key exists
@@ -81,7 +80,7 @@ export async function updateCompany(
 export async function getCompany(id: string): Promise<Company | null> {
   try {
     // Try to get company from cache first
-    const redis = await getRedisClient();
+    const redis = await Redis.getClient();
     const cacheKey = `companies:${id}`;
     const cachedCompany = await redis.get(cacheKey);
 
@@ -91,7 +90,7 @@ export async function getCompany(id: string): Promise<Company | null> {
     }
 
     // Not cached, get company from database
-    const db: Db = await dbConnection();
+    const db: Db = await Database.getInstance();
     const company: Company | null = await db
       .collection<Company>("companies")
       .findOne({ _id: new ObjectId(id) });
@@ -118,7 +117,7 @@ export async function getCompany(id: string): Promise<Company | null> {
  * @returns {Promise<number>} - The number of documents deleted
  */
 export async function deleteCompany(id: string): Promise<number> {
-  const db = await dbConnection();
+  const db = await Database.getInstance();
   try {
     // Delete from database first
     const res: DeleteResult = await db
@@ -127,7 +126,7 @@ export async function deleteCompany(id: string): Promise<number> {
 
     // If company was deleted from database, delete from cache if it exists
     if (res.deletedCount === 1) {
-      const redis = await getRedisClient();
+      const redis = await Redis.getClient();
       await redis.del(`companies:${id}`);
     }
 

@@ -1,33 +1,36 @@
+import dotenv from "dotenv";
 import { createClient, RedisClientType } from "redis";
 
-// Cache connection
-let redisClient: RedisClientType | null = null;
+dotenv.config();
 
-/**
- * ## Get Redis Client
- *
- * Connect to Redis client
- *
- * @returns {Promise<RedisClientType>} - The Redis client
- */
-export async function getRedisClient(): Promise<RedisClientType> {
-  // If Redis client already cached, return it
-  if (redisClient) {
-    return redisClient;
+export class Redis {
+  private static client: RedisClientType | null = null;
+  private static connectionString: string | undefined = process.env.REDIS_URL;
+
+  public static async getClient(): Promise<RedisClientType> {
+    if (!Redis.client) {
+      if (!Redis.connectionString)
+        throw new Error("REDIS_URL is not set in the environment variables.");
+
+      try {
+        Redis.client = createClient({
+          url: Redis.connectionString,
+        });
+      } catch (error) {
+        console.error("Error connecting to redis:", error);
+        throw error;
+      }
+
+      await Redis.client.connect();
+    }
+
+    return Redis.client;
   }
 
-  // Create Redis client
-  try {
-    redisClient = createClient({
-      url: process.env.REDIS_URL!,
-    });
-  } catch (err) {
-    throw err;
+  public static async close(): Promise<void> {
+    if (Redis.client) {
+      await Redis.client.quit();
+      Redis.client = null;
+    }
   }
-
-  // Connect to Redis
-  await redisClient.connect();
-  console.log("Successfully connected to Redis");
-
-  return redisClient;
 }

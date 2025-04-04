@@ -8,8 +8,8 @@ import {
   getCompany,
   updateCompany,
 } from "./handlers/handlers";
-import { getRedisClient } from "./redis";
-import { dbConnection } from "./database";
+import { Redis } from "./redis";
+import { Database } from "./database";
 import { generateAccessToken, authenticateToken } from "./auth";
 
 // Load environment variables from .env file
@@ -102,10 +102,10 @@ app.post("/structure-flow/auth", async (req: Request, res: Response) => {
 app.listen(port, async () => {
   try {
     console.log(`Server running on port ${port} 🚀`);
-    // Connect to Redis
-    await getRedisClient();
-    // Connect to MongoDB
-    await dbConnection();
+    // Initialise Redis
+    await Redis.getClient();
+    // Initialise MongoDB
+    await Database.getInstance();
   } catch (err) {
     console.error("Error connecting to Redis or MongoDB:", err);
     process.exit(1);
