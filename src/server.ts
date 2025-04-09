@@ -41,6 +41,7 @@ app.post(
 // Get Company
 app.get(
   "/structure-flow/companies/:id",
+  authenticateToken,
   async (req: Request, res: Response) => {
     try {
       const company: Company | null = await getCompany(req.params.id);

@@ -38,7 +38,7 @@ app.post("/structure-flow/companies", auth_1.authenticateToken, (req, res) => __
     }
 }));
 // Get Company
-app.get("/structure-flow/companies/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.get("/structure-flow/companies/:id", auth_1.authenticateToken, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const company = yield (0, handlers_1.getCompany)(req.params.id);
         const message = company ? "Company found" : "Company not found";
